@@ -176,7 +176,6 @@ else:
     ).figure
 
     st.pyplot(fig)
-)
      
 
 
