@@ -15,50 +15,57 @@ st.title("Marketing Performance Dashboard")
 # --------------------
 # Load data
 # --------------------
-
-url = 'https://raw.githubusercontent.com/eugenio9445/mkt_test/refs/heads/main/2026-01-21%205_28pm_2026-01-21-1915.csv'
+url = "https://raw.githubusercontent.com/eugenio9445/mkt_test/refs/heads/main/2026-01-21%205_28pm_2026-01-21-1915.csv"
 df = pd.read_csv(url)
+
 df.columns = df.columns.str.upper()
 df["FECHA"] = pd.to_datetime(df["FECHA"])
 
+# Platform mapping
+platform_map = {
+    1: "facebook",
+    2: "google",
+    3: "tiktok"
+}
+df["PLATAFORMA"] = df["PLATAFORMA"].map(platform_map)
 
 # --------------------
 # Sidebar filters
 # --------------------
 st.sidebar.header("Filters")
 
+# 1️⃣ Date filter (FIRST)
 date_range = st.sidebar.date_input(
     "Date range",
-    [df["FECHA"].min(), df["FECHA"].max()]
+    value=[df["FECHA"].min(), df["FECHA"].max()]
 )
-platform_map = {
-    1: "facebook",
-    2: "google",
-    3: "tiktok"
-}
 
-df["PLATAFORMA"] = df["PLATAFORMA"].map(platform_map)
+date_filtered_df = df[
+    (df["FECHA"].dt.date >= date_range[0]) &
+    (df["FECHA"].dt.date <= date_range[1])
+]
 
+# 2️⃣ Platform filter (depends on date)
 platforms = st.sidebar.multiselect(
     "Platform",
-    options=sorted(df["PLATAFORMA"].unique()),
-    default=sorted(df["PLATAFORMA"].unique())
+    options=sorted(date_filtered_df["PLATAFORMA"].dropna().unique()),
+    default=sorted(date_filtered_df["PLATAFORMA"].dropna().unique())
 )
 
+platform_filtered_df = date_filtered_df[
+    date_filtered_df["PLATAFORMA"].isin(platforms)
+]
+
+# 3️⃣ Campaign filter (depends on platform)
 campaigns = st.sidebar.multiselect(
     "Campaign",
-    options=sorted(df["CAMPAIGN_NAME"].unique()),
-    default=sorted(df["CAMPAIGN_NAME"].unique())
+    options=sorted(platform_filtered_df["CAMPAIGN_NAME"].dropna().unique()),
+    default=sorted(platform_filtered_df["CAMPAIGN_NAME"].dropna().unique())
 )
 
-# --------------------
-# Apply filters
-# --------------------
-filtered_df = df[
-    (df["FECHA"].dt.date >= date_range[0]) &
-    (df["FECHA"].dt.date <= date_range[1]) &
-    (df["PLATAFORMA"].isin(platforms)) &
-    (df["CAMPAIGN_NAME"].isin(campaigns))
+# 4️⃣ Final filtered dataframe
+filtered_df = platform_filtered_df[
+    platform_filtered_df["CAMPAIGN_NAME"].isin(campaigns)
 ]
 
 # --------------------
@@ -69,8 +76,8 @@ total_clicks = filtered_df["CLICKS"].sum()
 total_cost = filtered_df["COST"].sum()
 total_conversions = filtered_df["CONVERSIONS"].sum()
 
-ctr = (total_clicks / total_impressions) * 100 if total_impressions else 0
-cpc = total_cost / total_clicks if total_clicks else 0
+ctr = (total_clicks / total_impressions * 100) if total_impressions else 0
+cpc = (total_cost / total_clicks) if total_clicks else 0
 
 # --------------------
 # KPI section
@@ -139,24 +146,15 @@ st.dataframe(
     campaign_table.sort_values("CONVERSIONS", ascending=False),
     use_container_width=True
 )
-st.subheader("Platform Share")
 
-platform_pie_df = (
-    filtered_df
-    .groupby("PLATAFORMA", as_index=False)
-    .agg({
-        "COST": "sum"
-    })
-)
-
-# Optional metric selector
-
+# --------------------
+# Platform Share (Pie Chart)
+# --------------------
 st.subheader("Platform Share")
 
 pie_metric = st.selectbox(
     "Compare platforms by",
-    ["COST", "IMPRESSIONS", "CLICKS", "CONVERSIONS"],
-    key="platform_pie_metric"
+    ["COST", "IMPRESSIONS", "CLICKS", "CONVERSIONS"]
 )
 
 platform_pie_df = (
@@ -179,13 +177,3 @@ else:
     )
 
     st.altair_chart(pie_chart, use_container_width=True)
-     
-
-
-
-
-
-
-
-
-
