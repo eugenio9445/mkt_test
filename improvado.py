@@ -33,7 +33,7 @@ date_range = st.sidebar.date_input(
 
 platform_map = {
      1:"facebook",
-     2:"google":,
+     2:"google",
      3:"tiktok"
 }
 
@@ -89,7 +89,7 @@ st.divider()
 # --------------------
 # Time series chart
 # --------------------
-st.subheader("📈 Performance Over Time")
+st.subheader("Performance Over Time")
 
 daily_df = (
     filtered_df
@@ -114,7 +114,7 @@ st.line_chart(
 # --------------------
 # Campaign performance table
 # --------------------
-st.subheader("🎯 Campaign Performance")
+st.subheader("Campaign Performance")
 
 campaign_table = (
     filtered_df
