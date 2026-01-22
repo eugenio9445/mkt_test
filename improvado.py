@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("📊 Marketing Performance Dashboard")
+st.title("Marketing Performance Dashboard")
 
 # --------------------
 # Load data
@@ -24,12 +24,20 @@ df["FECHA"] = pd.to_datetime(df["FECHA"])
 # --------------------
 # Sidebar filters
 # --------------------
-st.sidebar.header("🔍 Filters")
+st.sidebar.header("Filters")
 
 date_range = st.sidebar.date_input(
     "Date range",
     [df["FECHA"].min(), df["FECHA"].max()]
 )
+
+platform_map = {
+     1:"facebook",
+     2:"google":,
+     3:"tiktok"
+}
+
+df["PLATAFORMA"] = df["PLATAFORMA"].str.lower().map(platform_map)
 
 platforms = st.sidebar.multiselect(
     "Platform",
