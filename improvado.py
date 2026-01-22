@@ -177,3 +177,34 @@ else:
     )
 
     st.altair_chart(pie_chart, use_container_width=True)
+
+st.subheader("Performance by Group")
+
+group_metric = st.selectbox(
+    "Compare groups by",
+    ["COST", "IMPRESSIONS", "CLICKS", "CONVERSIONS"],
+    key="group_metric"
+)
+
+group_df = (
+    filtered_df
+    .groupby("GROUP_NAME", as_index=False)
+    .agg({group_metric: "sum"})
+    .sort_values(group_metric, ascending=False)
+)
+
+if group_df.empty:
+    st.info("Adjust filters to display group data.")
+else:
+    bar_chart = (
+        alt.Chart(group_df)
+        .mark_bar()
+        .encode(
+            x=alt.X("GROUP_NAME:N", sort="-y", title="Group"),
+            y=alt.Y(f"{group_metric}:Q", title=group_metric),
+            tooltip=["GROUP_NAME", group_metric]
+        )
+        .properties(height=400)
+    )
+
+    st.altair_chart(bar_chart, use_container_width=True)
