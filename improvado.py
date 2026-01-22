@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
 
 # --------------------
 # Page config
@@ -149,6 +150,7 @@ platform_pie_df = (
 )
 
 # Optional metric selector
+
 st.subheader("Platform Share")
 
 pie_metric = st.selectbox(
@@ -166,16 +168,17 @@ platform_pie_df = (
 if platform_pie_df.empty:
     st.info("Adjust filters to display platform data.")
 else:
-    platform_pie_df = platform_pie_df.set_index("PLATAFORMA")
+    pie_chart = (
+        alt.Chart(platform_pie_df)
+        .mark_arc()
+        .encode(
+            theta=alt.Theta(field=pie_metric, type="quantitative"),
+            color=alt.Color(field="PLATAFORMA", type="nominal"),
+            tooltip=["PLATAFORMA", pie_metric]
+        )
+    )
 
-    fig = platform_pie_df.plot.pie(
-        y=pie_metric,
-        autopct="%1.1f%%",
-        legend=False,
-        ylabel=""
-    ).figure
-
-    st.pyplot(fig)
+    st.altair_chart(pie_chart, use_container_width=True)
      
 
 
