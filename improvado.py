@@ -29,9 +29,6 @@ platform_map = {
 }
 df["PLATAFORMA"] = df["PLATAFORMA"].map(platform_map)
 
-# --------------------
-# Sidebar filters
-# --------------------
 st.sidebar.header("Filters")
 
 # 1️⃣ Date filter (FIRST)
@@ -56,18 +53,28 @@ platform_filtered_df = date_filtered_df[
     date_filtered_df["PLATAFORMA"].isin(platforms)
 ]
 
-# 3️⃣ Campaign filter (depends on platform)
-campaigns = st.sidebar.multiselect(
-    "Campaign",
-    options=sorted(platform_filtered_df["CAMPAIGN_NAME"].dropna().unique()),
-    default=sorted(platform_filtered_df["CAMPAIGN_NAME"].dropna().unique())
+# 3️⃣ Group filter (depends on platform)
+groups = st.sidebar.multiselect(
+    "Group",
+    options=sorted(platform_filtered_df["GROUP_NAME"].dropna().unique()),
+    default=sorted(platform_filtered_df["GROUP_NAME"].dropna().unique())
 )
 
-# 4️⃣ Final filtered dataframe
-filtered_df = platform_filtered_df[
-    platform_filtered_df["CAMPAIGN_NAME"].isin(campaigns)
+group_filtered_df = platform_filtered_df[
+    platform_filtered_df["GROUP_NAME"].isin(groups)
 ]
 
+# 4️⃣ Campaign filter (depends on group)
+campaigns = st.sidebar.multiselect(
+    "Campaign",
+    options=sorted(group_filtered_df["CAMPAIGN_NAME"].dropna().unique()),
+    default=sorted(group_filtered_df["CAMPAIGN_NAME"].dropna().unique())
+)
+
+# 5️⃣ Final filtered dataframe
+filtered_df = group_filtered_df[
+    group_filtered_df["CAMPAIGN_NAME"].isin(campaigns)
+]
 # --------------------
 # KPI calculations
 # --------------------
