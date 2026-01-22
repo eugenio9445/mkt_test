@@ -30,14 +30,13 @@ date_range = st.sidebar.date_input(
     "Date range",
     [df["FECHA"].min(), df["FECHA"].max()]
 )
-
 platform_map = {
-     1:"facebook",
-     2:"google",
-     3:"tiktok"
+    1: "facebook",
+    2: "google",
+    3: "tiktok"
 }
 
-df["PLATAFORMA"] = df["PLATAFORMA"].str.lower().map(platform_map)
+df["PLATAFORMA"] = df["PLATAFORMA"].map(platform_map)
 
 platforms = st.sidebar.multiselect(
     "Platform",
