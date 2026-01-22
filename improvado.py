@@ -138,6 +138,39 @@ st.dataframe(
     campaign_table.sort_values("CONVERSIONS", ascending=False),
     use_container_width=True
 )
+st.subheader("Platform Share")
+
+platform_pie_df = (
+    filtered_df
+    .groupby("PLATAFORMA", as_index=False)
+    .agg({
+        "COST": "sum"
+    })
+)
+
+# Optional metric selector
+pie_metric = st.selectbox(
+    "Compare platforms by",
+    ["COST", "IMPRESSIONS", "CLICKS", "CONVERSIONS"],
+    key="platform_pie_metric"
+)
+
+platform_pie_df = (
+    filtered_df
+    .groupby("PLATAFORMA", as_index=False)
+    .agg({pie_metric: "sum"})
+)
+
+platform_pie_df = platform_pie_df.set_index("PLATAFORMA")
+
+st.pyplot(
+    platform_pie_df.plot.pie(
+        y=pie_metric,
+        autopct="%1.1f%%",
+        legend=False,
+        ylabel=""
+    ).figure
+)
      
 
 
