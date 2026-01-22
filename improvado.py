@@ -16,7 +16,8 @@ st.title("📊 Marketing Performance Dashboard")
 # --------------------
 
 url = 'https://raw.githubusercontent.com/eugenio9445/mkt_test/refs/heads/main/2026-01-21%205_28pm_2026-01-21-1915.csv'
-df = pd.read_csv(url,  index_col=0)
+df = pd.read_csv(url)
+df.columns = df.columns.str.upper()
 df["FECHA"] = pd.to_datetime(df["FECHA"])
 
 
