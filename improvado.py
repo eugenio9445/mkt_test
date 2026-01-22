@@ -149,6 +149,8 @@ platform_pie_df = (
 )
 
 # Optional metric selector
+st.subheader("Platform Share")
+
 pie_metric = st.selectbox(
     "Compare platforms by",
     ["COST", "IMPRESSIONS", "CLICKS", "CONVERSIONS"],
@@ -161,15 +163,19 @@ platform_pie_df = (
     .agg({pie_metric: "sum"})
 )
 
-platform_pie_df = platform_pie_df.set_index("PLATAFORMA")
+if platform_pie_df.empty:
+    st.info("Adjust filters to display platform data.")
+else:
+    platform_pie_df = platform_pie_df.set_index("PLATAFORMA")
 
-st.pyplot(
-    platform_pie_df.plot.pie(
+    fig = platform_pie_df.plot.pie(
         y=pie_metric,
         autopct="%1.1f%%",
         legend=False,
         ylabel=""
     ).figure
+
+    st.pyplot(fig)
 )
      
 
