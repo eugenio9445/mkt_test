@@ -99,11 +99,6 @@ metric = st.selectbox(
     ["IMPRESSIONS", "CLICKS", "COST", "CONVERSIONS"]
 )
 
-metric = st.selectbox(
-    "Select metric",
-    ["IMPRESSIONS", "CLICKS", "COST", "CONVERSIONS"]
-)
-
 st.line_chart(
     daily_df.set_index("FECHA")[metric]
 )
