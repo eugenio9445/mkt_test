@@ -2,9 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-# --------------------
-# Page config
-# --------------------
+
 st.set_page_config(
     page_title="Marketing Performance Dashboard",
     layout="wide"
@@ -12,16 +10,12 @@ st.set_page_config(
 
 st.title("Marketing Performance Dashboard")
 
-# --------------------
-# Load data
-# --------------------
 url = "https://raw.githubusercontent.com/eugenio9445/mkt_test/refs/heads/main/2026-01-21%205_28pm_2026-01-21-1915.csv"
 df = pd.read_csv(url)
 
 df.columns = df.columns.str.upper()
 df["FECHA"] = pd.to_datetime(df["FECHA"])
 
-# Platform mapping
 platform_map = {
     1: "facebook",
     2: "google",
@@ -31,7 +25,6 @@ df["PLATAFORMA"] = df["PLATAFORMA"].map(platform_map)
 
 st.sidebar.header("Filters")
 
-# 1️⃣ Date filter (FIRST)
 date_range = st.sidebar.date_input(
     "Date range",
     value=[df["FECHA"].min(), df["FECHA"].max()]
@@ -42,7 +35,7 @@ date_filtered_df = df[
     (df["FECHA"].dt.date <= date_range[1])
 ]
 
-# 2️⃣ Platform filter (depends on date)
+
 platforms = st.sidebar.multiselect(
     "Platform",
     options=sorted(date_filtered_df["PLATAFORMA"].dropna().unique()),
@@ -53,7 +46,6 @@ platform_filtered_df = date_filtered_df[
     date_filtered_df["PLATAFORMA"].isin(platforms)
 ]
 
-# 3️⃣ Group filter (depends on platform)
 groups = st.sidebar.multiselect(
     "Group",
     options=sorted(platform_filtered_df["GROUP_NAME"].dropna().unique()),
@@ -64,20 +56,18 @@ group_filtered_df = platform_filtered_df[
     platform_filtered_df["GROUP_NAME"].isin(groups)
 ]
 
-# 4️⃣ Campaign filter (depends on group)
+
 campaigns = st.sidebar.multiselect(
     "Campaign",
     options=sorted(group_filtered_df["CAMPAIGN_NAME"].dropna().unique()),
     default=sorted(group_filtered_df["CAMPAIGN_NAME"].dropna().unique())
 )
 
-# 5️⃣ Final filtered dataframe
+
 filtered_df = group_filtered_df[
     group_filtered_df["CAMPAIGN_NAME"].isin(campaigns)
 ]
-# --------------------
-# KPI calculations
-# --------------------
+
 total_impressions = filtered_df["IMPRESSIONS"].sum()
 total_clicks = filtered_df["CLICKS"].sum()
 total_cost = filtered_df["COST"].sum()
@@ -86,9 +76,7 @@ total_conversions = filtered_df["CONVERSIONS"].sum()
 ctr = (total_clicks / total_impressions * 100) if total_impressions else 0
 cpc = (total_cost / total_clicks) if total_clicks else 0
 
-# --------------------
-# KPI section
-# --------------------
+
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 col1.metric("Impressions", f"{total_impressions:,}")
@@ -100,9 +88,6 @@ col6.metric("CPC", f"${cpc:.2f}")
 
 st.divider()
 
-# --------------------
-# Time series chart
-# --------------------
 st.subheader("Performance Over Time")
 
 daily_df = (
@@ -125,9 +110,7 @@ st.line_chart(
     daily_df.set_index("FECHA")[metric]
 )
 
-# --------------------
-# Campaign performance table
-# --------------------
+
 st.subheader("Campaign Performance")
 
 campaign_table = (
@@ -154,9 +137,7 @@ st.dataframe(
     use_container_width=True
 )
 
-# --------------------
-# Platform Share (Pie Chart)
-# --------------------
+
 st.subheader("Platform Share")
 
 pie_metric = st.selectbox(
